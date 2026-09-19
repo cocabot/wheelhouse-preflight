@@ -1,0 +1,34 @@
+name: Bug report
+description: Report an incorrect audit result, invalid diagnostic, or crash.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not post secrets, private wheels, or vulnerability details. See SECURITY.md for security reports.
+  - type: input
+    id: version
+    attributes:
+      label: Tool version and Python version
+      placeholder: Output of wheelhouse-preflight --version and python --version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include the command, redacted target description, and how to reproduce the wheelhouse. Prefer small synthetic fixtures over private packages.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      description: Include JSON findings and exit status if available.
+    validations:
+      required: true

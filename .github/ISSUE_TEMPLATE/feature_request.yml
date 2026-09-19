@@ -1,0 +1,25 @@
+name: Workflow improvement
+description: Describe a real deployment workflow this tool could support better.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User and problem
+      description: Who encounters the problem, and what are they trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current workflow and alternatives
+      description: Explain the present workaround and why existing tools do not meet this particular need.
+    validations:
+      required: true
+  - type: textarea
+    id: improvement
+    attributes:
+      label: Proposed improvement
+      description: Include a concrete input and desired result if possible.
+    validations:
+      required: true

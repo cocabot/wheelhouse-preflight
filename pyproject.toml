@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wheelhouse-preflight"
+dynamic = ["version"]
+description = "Check an offline Python wheelhouse against an explicit deployment target"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "cocabot and contributors"}]
+keywords = ["wheelhouse", "offline", "airgap", "packaging", "dependencies", "deployment"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Software Development :: Build Tools",
+  "Typing :: Typed",
+]
+dependencies = ["packaging>=24.2,<27"]
+
+[project.urls]
+Repository = "https://github.com/cocabot/wheelhouse-preflight"
+Issues = "https://github.com/cocabot/wheelhouse-preflight/issues"
+Changelog = "https://github.com/cocabot/wheelhouse-preflight/blob/main/CHANGELOG.md"
+
+[project.scripts]
+wheelhouse-preflight = "wheelhouse_preflight.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "wheelhouse_preflight.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+wheelhouse_preflight = ["py.typed"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]

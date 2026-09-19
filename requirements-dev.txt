@@ -1,0 +1,4 @@
+# Runtime compatibility is tested separately at the minimum supported version.
+ruff==0.11.13
+mypy==1.16.0
+build==1.2.2
