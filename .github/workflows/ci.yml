@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python }}, packaging ${{ matrix.packaging }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ['3.11', '3.12', '3.13', '3.14']
+        packaging: [latest]
+        include:
+          - os: ubuntu-latest
+            python: '3.11'
+            packaging: minimum
+          - os: windows-latest
+            python: '3.13'
+            packaging: latest
+          - os: macos-latest
+            python: '3.13'
+            packaging: latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install package
+        run: python -m pip install .
+      - name: Test minimum runtime dependency
+        if: matrix.packaging == 'minimum'
+        run: python -m pip install packaging==24.2
+      - name: Unit and regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Installed CLI smoke test
+        run: |
+          wheelhouse-preflight --version
+          python -m wheelhouse_preflight target
+      - name: Download real wheels for metadata validation
+        run: |
+          python -m pip download --only-binary=:all: --no-deps click==8.1.8 colorama==0.4.6 --dest real-wheelhouse
+      - name: Check real wheels and a deliberately incomplete bundle
+        run: python scripts/validate_real_wheels.py real-wheelhouse > real-wheel-validation.json
+      - name: Record maintainer validation evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: real-wheel-validation-${{ matrix.os }}-python${{ matrix.python }}-packaging-${{ matrix.packaging }}
+          path: real-wheel-validation.json
+          if-no-files-found: error
+
+  quality:
+    name: Lint, types, and distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install development tools
+        run: python -m pip install -e . -r requirements-dev.txt
+      - run: python -m ruff check .
+      - run: python -m ruff format --check .
+      - run: python -m mypy src
+      - name: Build wheel and source archive
+        run: python -m build
+      - name: Install the built wheel in a clean environment
+        run: |
+          python -m venv /tmp/preflight-install
+          /tmp/preflight-install/bin/python -m pip install dist/*.whl
+          /tmp/preflight-install/bin/wheelhouse-preflight --version
+          /tmp/preflight-install/bin/python -m unittest discover -s tests -v
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: distributions
+          path: dist/*
+          if-no-files-found: error
