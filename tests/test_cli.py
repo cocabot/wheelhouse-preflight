@@ -145,23 +145,25 @@ class CliTests(unittest.TestCase):
                 self.assertEqual(raised.exception.code, 2)
 
     def test_broken_output_pipe_exits_cleanly(self) -> None:
-        output = Mock()
-        output.write.side_effect = BrokenPipeError()
+        output = io.StringIO()
         with (
+            patch.object(output, "write", side_effect=BrokenPipeError()),
+            patch.object(output, "close", wraps=output.close) as close,
             patch.object(cli, "capture_target", return_value={}),
             patch("sys.stdout", output),
         ):
             status = cli.main(["target"])
         self.assertEqual(status, 0)
-        output.close.assert_called_once()
+        close.assert_called_once()
 
     def test_broken_pipe_during_flush_exits_cleanly(self) -> None:
-        output = Mock()
-        output.flush.side_effect = BrokenPipeError()
+        output = io.StringIO()
         with (
+            patch.object(output, "flush", side_effect=BrokenPipeError()),
+            patch.object(output, "close", wraps=output.close) as close,
             patch.object(cli, "capture_target", return_value={}),
             patch("sys.stdout", output),
         ):
             status = cli.main(["target"])
         self.assertEqual(status, 0)
-        output.close.assert_called_once()
+        close.assert_called_once()
