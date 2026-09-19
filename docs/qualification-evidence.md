@@ -1,9 +1,7 @@
 # Qualification evidence record
 
-**Snapshot: 2026-09-18, first implementation publication preparation. Overall
-application readiness: WEAK — not ready to apply.** This is the project's evidence
-assessment, not an OpenAI decision. Public CI and release URLs must be added after
-those events occur.
+**Snapshot: 2026-09-19. Overall application readiness: WEAK — not ready to apply.**
+This is the project's evidence assessment, not an OpenAI decision.
 
 ## Project and current evidence
 
@@ -18,17 +16,18 @@ installed software will run.
 
 | ID | Evidence | What it establishes and limits |
 | --- | --- | --- |
-| E1 | [Public repository](https://github.com/cocabot/wheelhouse-preflight) and [MIT license commit](https://github.com/cocabot/wheelhouse-preflight/commit/36b299fd740162ee20c4c1bc5b0fcd0367701a87) | Public repository and MIT license: **CONFIRMED**. This snapshot precedes publication of the implementation. |
-| E2 | Local working-tree validation: 55 tests pass; lint, strict mypy, wheel build, and clean installation pass | Technical implementation evidence. Public code, commit-specific CI logs, and release validation URLs are pending. |
-| E3 | Local static check of actual Click 8.1.8 / Colorama 0.4.6 wheels for a native Linux target passes | A real-package compatibility example, not external use, full platform coverage, or proof of runtime success. |
-| E4 | Owner created the repository and delegated the development scope; agents performed architecture, implementation, and verification work | An AI-assisted maintainer workflow. It does not establish independent human review or an ongoing public maintenance record. |
-| E5 | [Repository metadata](https://api.github.com/repos/cocabot/wheelhouse-preflight), observed 2026-09-17T22:49:48Z: 0 stars, 0 forks | A dated discovery snapshot only. Neither measure establishes use. |
+| E1 | [Public repository](https://github.com/cocabot/wheelhouse-preflight), [MIT license](https://github.com/cocabot/wheelhouse-preflight/blob/2fc6411fd52867f93da59710c20da2b5b6c92e97/LICENSE), [merged implementation PR #1](https://github.com/cocabot/wheelhouse-preflight/pull/1) | Public working implementation, documentation, license and owner-controlled integration. |
+| E2 | [PR CI](https://github.com/cocabot/wheelhouse-preflight/actions/runs/35427287472) | 55 tests across the configured Python 3.11–3.14 / Linux, Windows and macOS matrix; minimum packaging version, lint, formatting, strict types, build and clean-wheel installation passed. This is a matrix, not every OS/Python combination. |
+| E3 | Real Click 8.1.8 / Colorama 0.4.6 validation in E2 | Complete bundles passed; deliberately omitting Colorama failed on Windows and passed on Linux/macOS as expected. Maintainer testing, not external adoption or runtime guarantees. |
+| E4 | [AI-assisted investigation](https://github.com/cocabot/wheelhouse-preflight/pull/1#issuecomment-5739990061), [test compatibility fix](https://github.com/cocabot/wheelhouse-preflight/commit/04db3ffcb0f1004866423cdf2f5292ced4639687) | A real Python 3.14 CI failure was investigated and fixed. The owner delegated development and release work to agents. This is not independent human review or proof of sustained human activity. |
+| E5 | [Repository metadata](https://api.github.com/repos/cocabot/wheelhouse-preflight), observed 2026-09-17T22:49:48Z: 0 stars, 0 forks | Historical discovery snapshot only, not evidence of use. |
+| E6 | [Release v0.1.0](https://github.com/cocabot/wheelhouse-preflight/releases/tag/v0.1.0), [release validation](https://github.com/cocabot/wheelhouse-preflight/actions/runs/35427951692) | Versioned wheel, source archive and SHA256SUMS published after validation of merged commit 2fc6411fd52867f93da59710c20da2b5b6c92e97. Checksums establish file integrity comparisons, not publisher authenticity. |
 
-Distribution is being prepared as an installable Python CLI. No published package
-or release is claimed in this snapshot. Package downloads, external dependents,
-installations, users, integrations, external contributors, and genuine community
-reports are **UNKNOWN**. Local installations and agent runs are development
-validation, not adoption. Missing observations must not be entered as zero.
+Distribution is through GitHub Releases. No PyPI publication is claimed.
+Package downloads, external dependents, installations, users, integrations,
+external contributors, and genuine community reports are **UNKNOWN**. Local
+installations, CI runs and maintainer downloads are validation, not adoption.
+Missing observations must not be entered as zero.
 
 ## Official program information
 
@@ -61,27 +60,29 @@ ratings do not estimate OpenAI's acceptance probability.
 
 | # | Dimension | Rating | Evidence and remaining gap |
 | --- | --- | --- | --- |
-| 1 | Active OSS project | PARTIAL | E1 confirms the public repository and license. E2 is locally verified code awaiting publication and public CI. |
-| 2 | Real project utility | PARTIAL | E2–E3 demonstrate scoped checks and a real-package example. Independent user validation is absent. |
-| 3 | External usage | UNKNOWN | No verified external user, dependent, installation, or integration evidence. |
-| 4 | Ecosystem value | PARTIAL | The explicit-target offline wheelhouse workflow and E3 establish a concrete technical use case. External adoption and ecosystem impact are unproven. |
-| 5 | Active maintenance | PARTIAL | E2 records implementation and verification work. Ongoing public fixes and responsibility are not yet demonstrated. |
-| 6 | Issue triage | UNKNOWN | No real issue investigation or response is recorded. |
-| 7 | Pull Request review | UNKNOWN | No public substantive PR review is recorded; local agent verification is not independent human review. |
-| 8 | Release management | PARTIAL | E2 verifies a build and clean installation locally. A versioned public release, changelog, and artifact evidence are pending. |
-| 9 | Core maintainer responsibility | PARTIAL | E1 and E4 establish repository creation and delegated AI-assisted work. Sustained public decisions, review, triage, releases, and support remain unproven. |
-| 10 | Project legitimacy | PARTIAL | E1 confirms public identity and MIT licensing; E2 supports working code. Public implementation, honest limitations, and provenance still need publication. |
-| 11 | Public evidence quality | PARTIAL | E1 supplies stable public identity/license evidence. Verification, release, maintenance, and external-use URLs are missing. |
-| 12 | Overall application readiness | WEAK | Genuine external use and ongoing maintenance are not established; public implementation, CI, and distribution are still being prepared. |
+| 1 | Active OSS project | CONFIRMED | E1–E2 and E6 establish public working code, license, passing CI and an initial release. This does not establish a long maintenance history. |
+| 2 | Real project utility | PARTIAL | E2–E3 demonstrate scoped checks and a real-package failure case. Independent user validation is absent. |
+| 3 | External usage | UNKNOWN | No verified external user, dependent, installation or integration evidence. |
+| 4 | Ecosystem value | PARTIAL | E3 and the [demand research](research.md) establish a concrete target-marker problem. Independent adoption and impact are unproven. |
+| 5 | Active maintenance | PARTIAL | E4 establishes a real compatibility investigation and fix. Continued maintenance is not yet evidenced. |
+| 6 | Issue triage | UNKNOWN | No genuine issue investigation or response is recorded. |
+| 7 | Pull Request review | PARTIAL | E1 and E4 contain substantive AI-assisted review findings and CI investigation. No independent human review is claimed. |
+| 8 | Release management | CONFIRMED | E6 records a versioned, CI-gated release with changelog and distribution artifacts. Future release continuity remains unproven. |
+| 9 | Core maintainer responsibility | PARTIAL | E1 and E4 establish owner-controlled, delegated development and release decisions. Sustained triage, review and support remain unproven. |
+| 10 | Project legitimacy | CONFIRMED | E1–E3 and E6 establish actual licensed functionality and transparent technical limits. This is not program qualification. |
+| 11 | Public evidence quality | PARTIAL | E1–E6 provide inspectable code, PR, fix, CI and release URLs. External-use and sustained-maintenance evidence remain absent. |
+| 12 | Overall application readiness | WEAK | Genuine external use and sustained maintenance responsibility are not established. |
 
 ## Bottleneck and next action
 
-The immediate bottleneck is converting the verified local implementation into
-publicly inspectable code, passing CI, and an installable release. The next step
-is the implementation PR, its checks, and release validation. After publication,
-genuine external use and maintenance responsibility become the key gaps; more
-internal features or activity alone cannot fill them. Handle a real user's
-reported problem ahead of cosmetic work or activity generation.
+The primary bottleneck is genuine external use. Versioned GitHub distribution,
+a reproducible real-wheel example and explicit limitations now allow others to
+evaluate the tool. Next, reduce installation friction through an appropriate
+package registry and obtain workflow feedback through relevant, permissioned
+channels. Publishing to an owner's registry account requires verified access;
+account creation or terms acceptance must be handled by the account holder.
+Do not treat promotion, download counters or additional internal features as
+proof of adoption. Handle a real user's reported problem ahead of cosmetic work.
 
 ## Evidence updates
 

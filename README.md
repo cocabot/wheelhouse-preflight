@@ -26,6 +26,24 @@ tests; it is not a resolver or installer. See the
 
 Python 3.11 or newer is required to run the tool.
 
+Install the published 0.1.0 wheel in a virtual environment:
+
+```sh
+python -m venv .venv
+# POSIX shell; on Windows use .venv\\Scripts\\activate
+. .venv/bin/activate
+python -m pip install "https://github.com/cocabot/wheelhouse-preflight/releases/download/v0.1.0/wheelhouse_preflight-0.1.0-py3-none-any.whl"
+wheelhouse-preflight --help
+```
+
+This command needs network access and installs the `packaging` dependency.
+[Release v0.1.0](https://github.com/cocabot/wheelhouse-preflight/releases/tag/v0.1.0)
+also provides a source archive and SHA256SUMS. The wheel's SHA-256 is
+`bf77097054c777d6526fbc604dbe035c17aac28ea1d9eccf6ec331736ee616ca`.
+A checksum detects differing bytes; it does not independently authenticate the publisher.
+
+To work from source instead:
+
 ```sh
 git clone https://github.com/cocabot/wheelhouse-preflight.git
 cd wheelhouse-preflight
