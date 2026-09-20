@@ -1,6 +1,6 @@
 # Qualification evidence record
 
-**Snapshot: 2026-09-19. Overall application readiness: WEAK — not ready to apply.**
+**Snapshot: 2026-09-20. Overall application readiness: WEAK — not ready to apply.**
 This is the project's evidence assessment, not an OpenAI decision.
 
 ## Project and current evidence
@@ -29,9 +29,19 @@ external contributors, and genuine community reports are **UNKNOWN**. Local
 installations, CI runs and maintainer downloads are validation, not adoption.
 Missing observations must not be entered as zero.
 
+Observed through the GitHub API on 2026-09-19: each of the three v0.1.0
+release assets had `download_count: 0`; the repository had 0 stars and 0 forks.
+At that observation the issue/PR listing contained only owner-authored PR #1.
+On 2026-09-20, [issue #2](https://github.com/cocabot/wheelhouse-preflight/issues/2)
+was opened to track the real PyPI distribution gap. It is owner-authored
+planning, not an external request or evidence of issue triage for users. These are scoped
+observations, not a count of all possible users. Future maintainer validation
+downloads must not be counted as external adoption. A similarly named function
+in another repository is not evidence of a dependency on this package.
+
 ## Official program information
 
-Official pages were checked on **2026-09-17**. Recheck them before applying and
+Official pages were rechecked on **2026-09-19**. Recheck them before applying and
 when an official change becomes known.
 
 | Official source | Relevant published information |
@@ -81,6 +91,9 @@ evaluate the tool. Next, reduce installation friction through an appropriate
 package registry and obtain workflow feedback through relevant, permissioned
 channels. Publishing to an owner's registry account requires verified access;
 account creation or terms acceptance must be handled by the account holder.
+The [CI integration guide](ci-integration.md) and [PyPI publishing procedure](pypi-publishing.md)
+make these next steps concrete. The PyPI procedure is publication preparation,
+not evidence that a PyPI package already exists.
 Do not treat promotion, download counters or additional internal features as
 proof of adoption. Handle a real user's reported problem ahead of cosmetic work.
 

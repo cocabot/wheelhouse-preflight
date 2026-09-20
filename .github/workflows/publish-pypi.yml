@@ -1,0 +1,121 @@
+name: Publish existing release to PyPI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing stable GitHub release version, without v (for example 0.1.0)
+        required: true
+        type: string
+      publish:
+        description: Upload to PyPI after verification (requires the owner-configured publisher)
+        required: true
+        default: false
+        type: boolean
+  push:
+    branches: [main]
+    paths: ['.github/pypi-version']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pypi-publication
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'cocabot/wheelhouse-preflight' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Select and validate the existing release version
+        id: version
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.verify_release import validate_version
+
+          if os.environ['EVENT_NAME'] == 'workflow_dispatch':
+              version = os.environ['REQUESTED_VERSION']
+          else:
+              version = Path('.github/pypi-version').read_text(encoding='utf-8').strip()
+          validate_version(version)
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'version={version}\n')
+          PY
+      - name: Download existing release and its verification records
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v$RELEASE_VERSION" > release.json
+          gh api "repos/$GITHUB_REPOSITORY/commits/v$RELEASE_VERSION" > release-commit.json
+          tag_sha=$(python -c "import json; print(json.load(open('release-commit.json'))['sha'])")
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/workflows/release.yml/runs?head_sha=$tag_sha&status=success&per_page=100" > release-runs.json
+          gh release download "v$RELEASE_VERSION" --repo "$GITHUB_REPOSITORY" --dir release-assets
+      - name: Verify release state, exact commit validation, and asset bytes
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          python scripts/verify_release.py --version "$RELEASE_VERSION" --directory release-assets --release-json release.json --commit-json release-commit.json --runs-json release-runs.json > verified-release.json
+          cat verified-release.json
+      - name: Check distribution metadata and install the published wheel cleanly
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          python -m pip install twine==6.2.0
+          python -m twine check --strict release-assets/*.whl release-assets/*.tar.gz
+          python -m venv "$RUNNER_TEMP/pypi-smoke"
+          "$RUNNER_TEMP/pypi-smoke/bin/python" -m pip install release-assets/*.whl
+          test "$("$RUNNER_TEMP/pypi-smoke/bin/wheelhouse-preflight" --version)" = "$RELEASE_VERSION"
+          "$RUNNER_TEMP/pypi-smoke/bin/wheelhouse-preflight" target > "$RUNNER_TEMP/target.json"
+          "$RUNNER_TEMP/pypi-smoke/bin/python" -c "from pathlib import Path; import sys; from wheelhouse_preflight.target import load_target; load_target(Path(sys.argv[1]))" "$RUNNER_TEMP/target.json"
+          python scripts/verify_release.py --version "$RELEASE_VERSION" --directory release-assets --release-json release.json --commit-json release-commit.json --runs-json release-runs.json
+      - name: Stage only the verified distributions
+        id: upload
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pypi-distributions-${{ steps.version.outputs.version }}
+          path: |
+            release-assets/*.whl
+            release-assets/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: prepare
+    if: github.repository == 'cocabot/wheelhouse-preflight' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.publish)
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/wheelhouse-preflight/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download the verified artifact from this workflow run
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact_id }}
+          merge-multiple: true
+          path: dist
+      - name: Publish identical distributions with PyPI Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
+          attestations: true

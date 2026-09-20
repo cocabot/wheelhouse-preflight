@@ -4,6 +4,10 @@ GitHub Releases is the initial distribution channel. This process produces a
 Python wheel, source archive, and SHA-256 checksums. It does not publish to PyPI
 and does not require a registry credential.
 
+To publish the same, already validated release files on PyPI, use the separate
+[Trusted Publishing procedure](pypi-publishing.md). That path requires the owner
+to configure a PyPI publisher first; its presence is not proof of publication.
+
 ## Release gate
 
 1. Resolve relevant defects and describe user-facing changes in `CHANGELOG.md`.
