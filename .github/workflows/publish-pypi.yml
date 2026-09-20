@@ -12,6 +12,11 @@ on:
         required: true
         default: false
         type: boolean
+  pull_request:
+    paths:
+      - '.github/workflows/publish-pypi.yml'
+      - 'scripts/verify_release.py'
+      - 'tests/test_release.py'
   push:
     branches: [main]
     paths: ['.github/pypi-version']
@@ -25,7 +30,7 @@ concurrency:
 
 jobs:
   prepare:
-    if: github.repository == 'cocabot/wheelhouse-preflight' && github.ref == 'refs/heads/main'
+    if: github.repository == 'cocabot/wheelhouse-preflight' && (github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,6 +58,8 @@ jobs:
 
           if os.environ['EVENT_NAME'] == 'workflow_dispatch':
               version = os.environ['REQUESTED_VERSION']
+          elif os.environ['EVENT_NAME'] == 'pull_request':
+              version = Path('.github/release-version').read_text(encoding='utf-8').strip()
           else:
               version = Path('.github/pypi-version').read_text(encoding='utf-8').strip()
           validate_version(version)

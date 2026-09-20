@@ -34,12 +34,20 @@ if another account owns it, resolve that conflict before publishing.
 The owner should also configure the GitHub
 [`pypi` environment](https://github.com/cocabot/wheelhouse-preflight/settings/environments)
 to allow deployments from `main` only, with any required reviewer protection the
-owner wants. The workflow itself also rejects all branches other than `main`.
+owner wants. Publication itself rejects all branches other than `main`.
 No repository secret or long-lived PyPI token is needed.
 
 The setup follows PyPI's official instructions for
 [creating a project through a pending publisher](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
 and [publishing with a Trusted Publisher](https://docs.pypi.org/trusted-publishers/using-a-publisher/).
+
+## Verification before publication
+
+PRs from branches in this repository that change the publishing workflow or its
+verifier run preparation against the existing release named in
+`.github/release-version`. Fork PRs do not run this job. The PR run only downloads,
+checks and smoke-tests the release; it cannot reach the OIDC publishing job.
+These downloads are maintainer validation, not adoption.
 
 ## Request publication after setup
 
