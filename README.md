@@ -147,6 +147,13 @@ Keep the exit status when integrating with CI. JSON results include a
 initial schema and CLI may change before version 1.0; consult the changelog when
 upgrading and pin the version used by automation.
 
+## Use it in your deployment pipeline
+
+The [CI integration guide](docs/ci-integration.md) provides a GitHub Actions
+gate for your existing wheelhouse, including failure-report retention and
+target-capture instructions. It also explains the native Windows/Linux/macOS
+Click example so you can evaluate the tool before connecting your own bundle.
+
 ## What is checked
 
 - Root and transitive `Requires-Dist` requirements, version constraints, and extras.
